@@ -21,6 +21,9 @@ export const store = configureStore({
   enhancers: isDev ? [applyMiddleware(logger)] : [],
 });
 
+export const storeActions = {
+  setMnemonic: mnemonicSlice.actions.setMnemonic,
+};
 
 export type AppDispatch = typeof store.dispatch;
 
