@@ -1,14 +1,16 @@
 import { Container, Grid } from '@mui/material';
+import DerivationPath from './derivation-path';
 import Mnemonic from './mnemonic';
 
-function Main() {
+const Main = () => {
   return (
     <Container maxWidth='md'>
       <Grid container rowGap={3}>
         <Mnemonic />
+        <DerivationPath />
       </Grid>
     </Container>
   );
-}
+};
 
 export default Main;

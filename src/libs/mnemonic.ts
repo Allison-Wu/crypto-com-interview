@@ -2,11 +2,10 @@ import * as crypto from 'crypto';
 import { mnemonicToSeedSync } from 'bip39';
 import { englishWordList } from '../libs/english-word-list';
 import { fromSeed } from 'bip32';
-import { codec, hash } from 'sjcl';
 
 const fillZero = (source: string, length: number) => {
   if (source.length >= length) return source;
-  return source.concat('0'.repeat(length - source.length));
+  return '0'.repeat(length - source.length).concat(source);
 };
 
 export const getRandomBytes = (numbOfWords: number) => {
@@ -28,9 +27,8 @@ export const getMnemonic = (randomBytes: Buffer) => {
     throw new Error('RandomBytes length in bits should be divisible by 32, but it is not '
       + `(${randomBytes.length} bytes = ${randomBytes.length * 8} bits).`);
   }
-
   const entropy = getEntropy(randomBytes);
-  const entropyChecksum = getEntropyChecksum(entropy);
+  const entropyChecksum = getEntropyChecksum(randomBytes);
   const indexes = getWordsIndexArray(entropy + entropyChecksum);
   const mnemonic = [];
   for (const index of indexes) {
@@ -39,19 +37,14 @@ export const getMnemonic = (randomBytes: Buffer) => {
   return mnemonic;
 };
 
-const hexStringToBinaryString = (hex: string) => {
-  let binaryString = '';
-  for (let i = 0; i < hex.length; i++) {
-    binaryString += fillZero(parseInt(hex[i], 16).toString(2), 4);
-  }
-  return binaryString;
+const bytesToBinary = (bytes: number[]) => {
+  return bytes.map((x) => fillZero(x.toString(2), 8)).join('');
 };
 
-export const getEntropyChecksum = (entropy: string) => {
-  const len = entropy.length / 32;
-  const hashed = hash.sha256.hash(entropy);
-  const hex = codec.hex.fromBits(hashed);
-  const binaryString = hexStringToBinaryString(hex);
+export const getEntropyChecksum = (randomBytes: Buffer) => {
+  const len = randomBytes.length * 8 / 32;
+  const hashBuffer = crypto.createHash('sha256').update(randomBytes).digest();
+  const binaryString = bytesToBinary(Array.from(hashBuffer));
   return binaryString.substring(0,len);
 };
 
