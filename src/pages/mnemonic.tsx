@@ -1,7 +1,8 @@
-import { Grid, MenuItem, Select, TextField } from '@mui/material';
+import { Grid, MenuItem, Select } from '@mui/material';
 import { SelectInputProps } from '@mui/material/Select/SelectInput';
 import { useDispatch, useSelector } from 'react-redux';
 import { PageLayout } from '../components/layout';
+import { DisableTextField } from '../components/disable-text-filed';
 import { RootState, storeActions } from '../stores';
 
 const wordsNumArray = [3,6,9,12,15,18,21,24];
@@ -10,25 +11,6 @@ interface INumOfWordsSelection {
   numOfWords: number;
   handleChange?: SelectInputProps<number>['onChange'];
 }
-
-interface IGridItem {
-  label?: string;
-  value?: string;
-}
-
-const DisableTextField = (props: IGridItem) => (
-  <Grid item xs={12}>
-    <TextField
-      disabled
-      multiline
-      rows={2}
-      style={{ width: '100%' }}
-      id='outlined-disabled'
-      label={props.label}
-      value = {props.value || ''}
-    />
-  </Grid>
-);
 
 const NumOfWordsSelection = (props: INumOfWordsSelection) => (
   <Select
@@ -63,7 +45,7 @@ const Mnemonic = () => {
       <SelectSentence
         numOfWords={mnemonicState.numOfWords}
         handleChange={event => dispatch(
-          storeActions.setMnemonic({ numOfWords: Number(event.target.value) })
+          storeActions.calcMnemonic({ numOfWords: Number(event.target.value) })
         )}
       />
       <DisableTextField label='BIP39 Mnemonic' value={mnemonicState.words} />

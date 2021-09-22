@@ -2,6 +2,7 @@ import * as crypto from 'crypto';
 import { mnemonicToSeedSync } from 'bip39';
 import { englishWordList } from '../libs/english-word-list';
 import { fromSeed } from 'bip32';
+import { IMnemonic } from '../stores/mnemonic-store';
 
 const fillZero = (source: string, length: number) => {
   if (source.length >= length) return source;
@@ -37,6 +38,20 @@ export const getMnemonic = (randomBytes: Buffer) => {
   return mnemonic;
 };
 
+export const calcMnemonic = (numOfWords: number) => {
+  const randomBytes = getRandomBytes(numOfWords);
+  const words = getMnemonic(randomBytes).join(' ');
+  const seedBuffer = getBip39Seed(words);
+
+  const mnemonic: IMnemonic = {
+    words,
+    numOfWords,
+    seed: seedBuffer.toString('hex'),
+    rootKey: fromSeed(seedBuffer).toBase58(),
+  };
+  return mnemonic;
+};
+
 const bytesToBinary = (bytes: number[]) => {
   return bytes.map((x) => fillZero(x.toString(2), 8)).join('');
 };
@@ -60,8 +75,4 @@ export const getWordsIndexArray = (binaryStrWithCs: string) => {
 
 export const getBip39Seed = (phrase: string, passphrase = '') => {
   return mnemonicToSeedSync(phrase, passphrase);
-};
-
-export const getBip32RootKey = (seed: Buffer) => {
-  return fromSeed(seed);
 };

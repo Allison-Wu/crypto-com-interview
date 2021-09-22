@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as Mnemonic from '../libs/mnemonic';
+
 export interface IMnemonic {
   numOfWords: number;
   entropy?: string;
@@ -14,16 +15,9 @@ export const mnemonicSlice = createSlice({
     numOfWords: 15,
   } as IMnemonic,
   reducers: {
-    setMnemonic: (state, action: PayloadAction<IMnemonic>) => {
-      const randomBytes = Mnemonic.getRandomBytes(action.payload.numOfWords);
-      const words = Mnemonic.getMnemonic(randomBytes).join(' ');
-      const seedBuffer = Mnemonic.getBip39Seed(words);
-      return {
-        words,
-        numOfWords: action.payload.numOfWords,
-        seed: seedBuffer.toString('hex'),
-        rootKey: Mnemonic.getBip32RootKey(seedBuffer).toBase58(),
-      };
-    }
+    calcMnemonic: (state, action: PayloadAction<IMnemonic>) => {
+      // It is not necessary to have a separate method in lib, just to facilitate testing the calc flow.
+      return Mnemonic.calcMnemonic(action.payload.numOfWords);
+    },
   },
 });
