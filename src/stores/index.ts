@@ -24,6 +24,7 @@ export const store = configureStore({
 export const storeActions = {
   calcMnemonic: mnemonicSlice.actions.calcMnemonic,
   calcDerivationPath: derivationPathSlice.actions.calcDerivationPath,
+  addDerivedAddress: derivedAddressesSlice.actions.addDerivedAddress,
 };
 
 export type AppDispatch = typeof store.dispatch;

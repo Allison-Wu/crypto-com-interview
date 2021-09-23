@@ -32,9 +32,11 @@ export const getExtendedKey = (derivationPath: string, rootKey: BIP32Interface) 
   return extendedKey;
 };
 
+export const getBip32RootKeyByStr = (strBip32RootKey: string) => fromBase58(strBip32RootKey);
+
 export const calcDerivationPath = (pathLevel: IPathLevel, strBip32RootKey?: string) => {
   if (!strBip32RootKey) return;
-  const bip32RootKey = fromBase58(strBip32RootKey);
+  const bip32RootKey = getBip32RootKeyByStr(strBip32RootKey);
   const bip32DerivationPath = getDerivationPath(pathLevel);
   const bip44DerivationPath = getBip44DerivationPath(pathLevel);
 
