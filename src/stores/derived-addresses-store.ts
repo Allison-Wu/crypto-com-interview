@@ -1,4 +1,3 @@
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as DerivationAddress from '../libs/derivation-addresses';
 import { getBip32RootKeyByStr } from '../libs/derivation-path';
@@ -21,7 +20,6 @@ interface IAddDerivedAddress {
   size: number;
 }
 
-
 export const derivedAddressesSlice = createSlice({
   name: 'derivedAddressesInfos',
   initialState: {
@@ -29,15 +27,17 @@ export const derivedAddressesSlice = createSlice({
   } as IDerivationAddressState,
   reducers: {
     addDerivedAddress: (state, action: PayloadAction<IAddDerivedAddress>) => {
-      // It is not necessary to have a separate method in lib, just to facilitate testing the calc flow.
       const { bip32DerivationPath, rootKey, size } = action.payload;
       if (!rootKey) {
         return { derivationAddresses: [] };
       }
+
+      const originAddresses = state.derivationAddresses;
       const bip32RootKey = getBip32RootKeyByStr(rootKey);
-      const currentLen = state.derivationAddresses.length;
+      const currentLen = originAddresses.length;
       const addresses = DerivationAddress.calcDerivedAddress(currentLen, size, bip32DerivationPath, bip32RootKey);
-      return { derivationAddresses: state.derivationAddresses.concat(addresses) };
+      return { derivationAddresses: originAddresses.concat(addresses) };
     },
+    resetDerivedAddress: () => ({ derivationAddresses: [] })
   },
 });

@@ -15,8 +15,8 @@ export const mnemonicSlice = createSlice({
     numOfWords: 15,
   } as IMnemonic,
   reducers: {
+    // It is not necessary to have a separate method in lib, just to facilitate testing the calc flow.
     calcMnemonic: (state, action: PayloadAction<IMnemonic>) => {
-      // It is not necessary to have a separate method in lib, just to facilitate testing the calc flow.
       return Mnemonic.calcMnemonic(action.payload.numOfWords);
     },
   },

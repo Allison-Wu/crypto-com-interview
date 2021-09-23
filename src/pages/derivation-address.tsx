@@ -16,22 +16,29 @@ interface IDispatchAddDaParams {
   derivationAddresses: IDerivedAddress[];
   bip32DerivationPath?: string;
   rootKey?: string;
+  reset?: boolean
   dispatch: Dispatch<any>;
 }
 
 interface IAddressTableProps {
   derivationAddresses: IDerivedAddress[];
-  defaultRowsPerPage: number;
+  rowsPerPage: number;
   addRows: (size:number) => void;
+  setRowsPerPage: Dispatch<React.SetStateAction<number>>;
 }
 
 const dispatchAddDa = (params: IDispatchAddDaParams) => {
-  const { size, derivationAddresses, bip32DerivationPath, rootKey, dispatch } = params;
-  const currentSize = derivationAddresses.length;
-  if (currentSize > MAX_ROW_LENGTH) return;
-
+  const { size, derivationAddresses, bip32DerivationPath, rootKey, reset, dispatch } = params;
   let rowSize = size;
-  if (currentSize + size > MAX_ROW_LENGTH) rowSize = MAX_ROW_LENGTH - currentSize;
+  if (reset) {
+    dispatch(storeActions.resetDerivedAddress());
+  } else {
+    const currentSize = derivationAddresses.length;
+    if (currentSize > MAX_ROW_LENGTH) return;
+  
+    if (currentSize + size > MAX_ROW_LENGTH) rowSize = MAX_ROW_LENGTH - currentSize;
+  }
+
   dispatch(storeActions.addDerivedAddress({
     rootKey,
     bip32DerivationPath,
@@ -41,9 +48,8 @@ const dispatchAddDa = (params: IDispatchAddDaParams) => {
 
 const AddressTable = (props: IAddressTableProps) => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(props.defaultRowsPerPage);
   
-  const addresses = props.derivationAddresses;
+  const { derivationAddresses: addresses, rowsPerPage, setRowsPerPage } = props;
   const displayRows = addresses.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
@@ -52,13 +58,13 @@ const AddressTable = (props: IAddressTableProps) => {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              {ADDRESS_TABLE_HEADER.map((header) => (<TableCell>{header}</TableCell>))}
+              {ADDRESS_TABLE_HEADER.map((header) => (<TableCell key={header}>{header}</TableCell>))}
             </TableRow>
           </TableHead>
           <TableBody>
             {displayRows.map(row => (
               <TableRow key={row.id}>
-                <TableCell component="th" scope="row">{row.path}</TableCell>
+                <TableCell>{row.path}</TableCell>
                 <TableCell>{row.address}</TableCell>
                 <TableCell>{row.publicKey}</TableCell>
                 <TableCell>{row.privateKey}</TableCell>
@@ -73,7 +79,7 @@ const AddressTable = (props: IAddressTableProps) => {
         count={MAX_ROW_LENGTH}
         rowsPerPage={rowsPerPage}
         page={page}
-        onPageChange={(_, newPage) => {
+        onPageChange={(event, newPage) => {
           props.addRows(MAX_DISPLAY_ROW);
           setPage(newPage);
         }}
@@ -88,30 +94,32 @@ const AddressTable = (props: IAddressTableProps) => {
 };
 
 const DerivationAddress = () => {
-  const defaultRowsPerPage = ROWS_PER_PAGE_OPTIONS[0];
   const dispatch = useDispatch();
   const {
     mnemonic: mState, derivationPath: dpState, derivedAddresses: daState
   } = useSelector((state: RootState) => state);
+  const [rowsPerPage, setRowsPerPage] = useState(ROWS_PER_PAGE_OPTIONS[0]);
 
-  const addRows = (size: number) => dispatchAddDa({
+  const addRows = (size: number, reset = false) => dispatchAddDa({
     dispatch,
     size,
+    reset,
     derivationAddresses: daState.derivationAddresses,
     bip32DerivationPath: dpState.derivationPath,
     rootKey: mState.rootKey,
   });
 
   useEffect(() => {
-    addRows(defaultRowsPerPage);
+    addRows(rowsPerPage, true);
   }, [dispatch, mState.rootKey, dpState.derivationPath]);
 
   return (
     <PageLayout title='Derived Addresses'>
       <AddressTable
         derivationAddresses={daState.derivationAddresses}
-        defaultRowsPerPage={defaultRowsPerPage}
+        rowsPerPage={rowsPerPage}
         addRows={addRows}
+        setRowsPerPage={setRowsPerPage}
       />
     </PageLayout>
   );

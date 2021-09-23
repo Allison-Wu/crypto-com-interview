@@ -25,6 +25,7 @@ export const storeActions = {
   calcMnemonic: mnemonicSlice.actions.calcMnemonic,
   calcDerivationPath: derivationPathSlice.actions.calcDerivationPath,
   addDerivedAddress: derivedAddressesSlice.actions.addDerivedAddress,
+  resetDerivedAddress: derivedAddressesSlice.actions.resetDerivedAddress,
 };
 
 export type AppDispatch = typeof store.dispatch;

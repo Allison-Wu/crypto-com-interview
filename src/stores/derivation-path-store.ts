@@ -26,8 +26,8 @@ export const derivationPathSlice = createSlice({
     change: 0,
   } as IDerivationPath,
   reducers: {
+    // It is not necessary to have a separate method in lib, just to facilitate testing the calc flow.
     calcDerivationPath: (state, action: PayloadAction<string>) => {
-      // It is not necessary to have a separate method in lib, just to facilitate testing the calc flow.
       const result = DerivationPath.calcDerivationPath(state, action.payload);
       if (result) return result;
       return pick(state, ['purpose', 'coin', 'account', 'change']);
