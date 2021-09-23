@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import * as Mnemonic from '../libs/mnemonic';
+import { englishWordList } from '../libs/english-word-list';
+import { Mnemonic } from '../libs/mnemonic';
 
 export interface IMnemonic {
   numOfWords: number;
@@ -17,7 +18,7 @@ export const mnemonicSlice = createSlice({
   reducers: {
     // It is not necessary to have a separate method in lib, just to facilitate testing the calc flow.
     calcMnemonic: (state, action: PayloadAction<IMnemonic>) => {
-      return Mnemonic.calcMnemonic(action.payload.numOfWords);
+      return Mnemonic.calcMnemonic(action.payload.numOfWords, englishWordList);
     },
   },
 });

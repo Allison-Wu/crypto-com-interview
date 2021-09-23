@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import * as DerivationAddress from '../libs/derivation-addresses';
-import { getBip32RootKeyByStr } from '../libs/derivation-path';
+import { DerivationPath } from '../libs/derivation-path';
+import { DerivedAddress } from '../libs/derivation-addresses';
 
 export interface IDerivedAddress {
   id: string;
@@ -33,9 +33,9 @@ export const derivedAddressesSlice = createSlice({
       }
 
       const originAddresses = state.derivationAddresses;
-      const bip32RootKey = getBip32RootKeyByStr(rootKey);
+      const bip32RootKey = DerivationPath.getBip32RootKeyByStr(rootKey);
       const currentLen = originAddresses.length;
-      const addresses = DerivationAddress.calcDerivedAddress(currentLen, size, bip32DerivationPath, bip32RootKey);
+      const addresses = DerivedAddress.calcDerivedAddress(currentLen, size, bip32DerivationPath, bip32RootKey);
       return { derivationAddresses: originAddresses.concat(addresses) };
     },
     resetDerivedAddress: () => ({ derivationAddresses: [] })

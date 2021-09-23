@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { pick } from 'lodash';
-import * as DerivationPath from '../libs/derivation-path';
+import { DerivationPath } from '../libs/derivation-path';
 
 export interface IPathLevel {
   purpose: number;

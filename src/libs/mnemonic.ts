@@ -1,78 +1,84 @@
 import * as crypto from 'crypto';
 import { mnemonicToSeedSync } from 'bip39';
-import { englishWordList } from '../libs/english-word-list';
 import { fromSeed } from 'bip32';
 import { IMnemonic } from '../stores/mnemonic-store';
 
-const fillZero = (source: string, length: number) => {
-  if (source.length >= length) return source;
-  return '0'.repeat(length - source.length).concat(source);
-};
-
-export const getRandomBytes = (numbOfWords: number) => {
-  const size = numbOfWords / 3 * 32;
-  return crypto.randomBytes(size / 8);
-};
-
-export const getEntropy = (randomBytes: Buffer) => {
-  let binaryStr = '';
-  for (let i = 0; i < randomBytes.length; i++) {
-    const bin = randomBytes[i].toString(2);
-    binaryStr = binaryStr.concat(fillZero(bin, 8).slice(-8));
+export class Mnemonic {
+  static getRandomBytes(numbOfWords: number) {
+    const size = numbOfWords / 3 * 32;
+    return crypto.randomBytes(size / 8);
   }
-  return binaryStr;
-};
 
-export const getMnemonic = (randomBytes: Buffer) => {
-  if (randomBytes.length % 4 > 0) {
-    throw new Error('RandomBytes length in bits should be divisible by 32, but it is not '
-      + `(${randomBytes.length} bytes = ${randomBytes.length * 8} bits).`);
+  static getEntropy(randomBytes: Buffer) {
+    let binaryStr = '';
+    for (let i = 0; i < randomBytes.length; i++) {
+      const bin = randomBytes[i].toString(2);
+      binaryStr = binaryStr.concat(this.fillZero(bin, 8).slice(-8));
+    }
+    return binaryStr;
   }
-  const entropy = getEntropy(randomBytes);
-  const entropyChecksum = getEntropyChecksum(randomBytes);
-  const indexes = getWordsIndexArray(entropy + entropyChecksum);
-  const mnemonic = [];
-  for (const index of indexes) {
-    mnemonic.push(englishWordList[index]);
+
+  static getWordsByIndexes(indexes: number[], wordList: string[]) {
+    const words = [];
+    for (const index of indexes) {
+      if (index === -1) {
+        throw new Error(`Invalid index[${index}] for transferring word!`);
+      }
+      words.push(wordList[index]);
+    }
+    return words;
   }
-  return mnemonic;
-};
 
-export const calcMnemonic = (numOfWords: number) => {
-  const randomBytes = getRandomBytes(numOfWords);
-  const words = getMnemonic(randomBytes).join(' ');
-  const seedBuffer = getBip39Seed(words);
-
-  const mnemonic: IMnemonic = {
-    words,
-    numOfWords,
-    seed: seedBuffer.toString('hex'),
-    rootKey: fromSeed(seedBuffer).toBase58(),
-  };
-  return mnemonic;
-};
-
-const bytesToBinary = (bytes: number[]) => {
-  return bytes.map((x) => fillZero(x.toString(2), 8)).join('');
-};
-
-export const getEntropyChecksum = (randomBytes: Buffer) => {
-  const len = randomBytes.length * 8 / 32;
-  const hashBuffer = crypto.createHash('sha256').update(randomBytes).digest();
-  const binaryString = bytesToBinary(Array.from(hashBuffer));
-  return binaryString.substring(0,len);
-};
-
-export const getWordsIndexArray = (binaryStrWithCs: string) => {
-  const len = binaryStrWithCs.length / 11;
-  const indexes = [];
-  for (let i = 0; i < len; i++) {
-    const valueStr = binaryStrWithCs.substring(11 * i, 11 * (i +1));
-    indexes.push(parseInt(valueStr, 2));
+  static getMnemonic(randomBytes: Buffer, wordList: string[]) {
+    if (randomBytes.length % 4 > 0) {
+      throw new Error(`Invalid length[${randomBytes.length}] of the random bytes`);
+    }
+    const entropy = this.getEntropy(randomBytes);
+    const entropyChecksum = this.getEntropyChecksum(randomBytes);
+    const indexes = this.getWordsIndexArray(entropy + entropyChecksum);
+    return this.getWordsByIndexes(indexes, wordList);
   }
-  return indexes;
-};
 
-export const getBip39Seed = (phrase: string, passphrase = '') => {
-  return mnemonicToSeedSync(phrase, passphrase);
-};
+  static calcMnemonic(numOfWords: number, wordList: string[]) {
+    if (numOfWords % 3 !== 0) {
+      throw new Error(`Invalid length[${numOfWords}] of words!`);
+    }
+    const randomBytes = this.getRandomBytes(numOfWords);
+    const words = this.getMnemonic(randomBytes, wordList).join(' ');
+    const seedBuffer = this.getBip39Seed(words);
+
+    const mnemonic: IMnemonic = {
+      words,
+      numOfWords,
+      seed: seedBuffer.toString('hex'),
+      rootKey: fromSeed(seedBuffer).toBase58(),
+    };
+    return mnemonic;
+  }
+
+  static getEntropyChecksum(randomBytes: Buffer) {
+    const len = randomBytes.length * 8 / 32;
+    const hashBuffer = crypto.createHash('sha256').update(randomBytes).digest();
+    const binaryString = Array.from(hashBuffer).map((x) => this.fillZero(x.toString(2), 8)).join('');
+    return binaryString.substring(0,len);
+  }
+
+  static getWordsIndexArray(binaryStrWithCs: string) {
+    const len = binaryStrWithCs.length / 11;
+    const indexes = [];
+    for (let i = 0; i < len; i++) {
+      const valueStr = binaryStrWithCs.substring(11 * i, 11 * (i +1));
+      indexes.push(parseInt(valueStr, 2));
+    }
+    return indexes;
+  }
+
+  static getBip39Seed(phrase: string, passphrase = '') {
+    return mnemonicToSeedSync(phrase, passphrase);
+  }
+
+  static fillZero(source: string, length: number) {
+    if (source.length >= length) return source;
+    return '0'.repeat(length - source.length).concat(source);
+  }
+}
