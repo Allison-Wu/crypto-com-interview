@@ -5,7 +5,7 @@ import { PageLayout } from '../components/layout';
 import { DisableTextField } from '../components/disable-text-filed';
 import { RootState, storeActions } from '../stores';
 
-const wordsNumArray = [3,6,9,12,15,18,21,24];
+const WORDS_NUM_OPTIONS = [3,6,9,12,15,18,21,24];
 
 interface INumOfWordsSelection {
   numOfWords: number;
@@ -19,7 +19,7 @@ const NumOfWordsSelection = (props: INumOfWordsSelection) => (
     value={props.numOfWords}
     onChange={props.handleChange} size='small'
   >
-    {wordsNumArray.map((num) => (
+    {WORDS_NUM_OPTIONS.map((num) => (
       <MenuItem key={num} value={num}>
         {num}
       </MenuItem>
