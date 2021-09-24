@@ -1,6 +1,6 @@
-import { englishWordList } from '../libs/english-word-list';
+import { englishWordList } from '../../libs/english-word-list';
 
-export interface IMnemonicResult {
+export interface IMockMnemonic {
   numOfWords: number;
   randomValue: Buffer;
   entropy: string;
@@ -12,7 +12,7 @@ export interface IMnemonicResult {
   seed?: string;
 }
 
-export const mnemonicResults: IMnemonicResult[] = [{
+export const mockMnemonics: IMockMnemonic[] = [{
   numOfWords: 3,
   randomValue: Buffer.from([245, 110, 160, 17]),
   entropy: '11110101011011101010000000010001',

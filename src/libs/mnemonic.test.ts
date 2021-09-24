@@ -1,6 +1,6 @@
 import { Mnemonic } from './mnemonic';
 import * as faker from 'faker';
-import { mnemonicResults } from '../test/result';
+import { mockMnemonics } from '../test/mock/mnemonic';
 import { pick } from 'lodash';
 import { SinonStub } from 'sinon';
 import { loadSandbox } from '../test/load-sandbox';
@@ -27,60 +27,60 @@ describe('Mnemonic', () => {
   });
 
   describe('getEntropy', () => {
-    for (const result of mnemonicResults) {
+    for (const mock of mockMnemonics) {
 
-      it(`should return a correct entropy with random value for ${result.numOfWords} words`, () => {
-        expect(result.entropy).toEqual(Mnemonic.getEntropy(result.randomValue));
+      it(`should return a correct entropy with random value for ${mock.numOfWords} words`, () => {
+        expect(mock.entropy).toEqual(Mnemonic.getEntropy(mock.randomValue));
       });
     }
   });
 
   describe('getEntropyChecksum', () => {
-    for (const result of mnemonicResults) {
+    for (const mock of mockMnemonics) {
 
-      it(`should return a correct checksum entropy with random value for ${result.numOfWords} words`, () => {
-        expect(result.checksum).toEqual(Mnemonic.getEntropyChecksum(result.randomValue));
+      it(`should return a correct checksum entropy with random value for ${mock.numOfWords} words`, () => {
+        expect(mock.checksum).toEqual(Mnemonic.getEntropyChecksum(mock.randomValue));
       });
     }
   });
 
   describe('getEntropyChecksum', () => {
-    for (const result of mnemonicResults) {
+    for (const mock of mockMnemonics) {
 
-      it(`should return a correct checksum entropy with random value for ${result.numOfWords} words`, () => {
-        expect(result.checksum).toEqual(Mnemonic.getEntropyChecksum(result.randomValue));
+      it(`should return a correct checksum entropy with random value for ${mock.numOfWords} words`, () => {
+        expect(mock.checksum).toEqual(Mnemonic.getEntropyChecksum(mock.randomValue));
       });
     }
   });
 
   describe('getWordsByIndexes', () => {
-    for (const result of mnemonicResults) {
-      it(`should return a correct words array with index array for ${result.numOfWords} words`, () => {
-        const words = Mnemonic.getWordsByIndexes(result.indexes, result.wordList);
-        expect(result.words).toEqual(words);
-        expect(result.numOfWords).toEqual(words.length);
+    for (const mock of mockMnemonics) {
+      it(`should return a correct words array with index array for ${mock.numOfWords} words`, () => {
+        const words = Mnemonic.getWordsByIndexes(mock.indexes, mock.wordList);
+        expect(mock.words).toEqual(words);
+        expect(mock.numOfWords).toEqual(words.length);
       });
     }
 
     it('should throw error when index array include -1', () => {
       expect(
-        () => Mnemonic.getWordsByIndexes(mnemonicResults[0].indexes.concat(-1), mnemonicResults[0].wordList)
+        () => Mnemonic.getWordsByIndexes(mockMnemonics[0].indexes.concat(-1), mockMnemonics[0].wordList)
       ).toThrowError('Invalid index[-1] for transferring word!');
     });
   });
 
   describe('getMnemonic', () => {
-    for (const result of mnemonicResults) {
-      it(`should return correct mnemonic with random bytes for ${result.numOfWords} words`, () => {
-        const words = Mnemonic.getMnemonic(result.randomValue, result.wordList);
-        expect(words.length).toEqual(result.numOfWords);
-        expect(words).toEqual(result.words);
+    for (const mock of mockMnemonics) {
+      it(`should return correct mnemonic with random bytes for ${mock.numOfWords} words`, () => {
+        const words = Mnemonic.getMnemonic(mock.randomValue, mock.wordList);
+        expect(words.length).toEqual(mock.numOfWords);
+        expect(words).toEqual(mock.words);
       });
     }
 
     it('should throw error if number of words cannot divisible by 3', () => {
       expect(
-        () => Mnemonic.getMnemonic(Buffer.from([99]), mnemonicResults[0].wordList)
+        () => Mnemonic.getMnemonic(Buffer.from([99]), mockMnemonics[0].wordList)
       ).toThrowError('Invalid length[1] of the random bytes');
     });
   });
@@ -91,14 +91,14 @@ describe('Mnemonic', () => {
       getRandomBytesStub = sandbox.stub(Mnemonic, 'getRandomBytes');
     });
 
-    for (const result of mnemonicResults) {
-      it(`should return correct mnemonic for ${result.numOfWords} words`, () => {
-        getRandomBytesStub.returns(result.randomValue);
-        const mnemonicInfo = Mnemonic.calcMnemonic(result.numOfWords, result.wordList);
-        expect(getRandomBytesStub.calledWith(result.numOfWords)).toBeTruthy();
+    for (const mock of mockMnemonics) {
+      it(`should return correct mnemonic for ${mock.numOfWords} words`, () => {
+        getRandomBytesStub.returns(mock.randomValue);
+        const mnemonicInfo = Mnemonic.calcMnemonic(mock.numOfWords, mock.wordList);
+        expect(getRandomBytesStub.calledWith(mock.numOfWords)).toBeTruthy();
         expect({
-          ...pick(result, ['numOfWords', 'seed', 'rootKey']),
-          words: result.words.join(' '),
+          ...pick(mock, ['numOfWords', 'seed', 'rootKey']),
+          words: mock.words.join(' '),
         }).toEqual(mnemonicInfo);
       });
     }

@@ -3,7 +3,7 @@ import { DerivationPath } from '../libs/derivation-path';
 import { payments } from 'bitcoinjs-lib';
 import { IDerivedAddress } from '../stores/derived-addresses-store';
 
-export class DerivedAddress {
+export class DerivationAddress {
   static getPaymentAddress(addressDerivationPath: string, rootKey: BIP32Interface) {
     const extendedKey = DerivationPath.getExtendedKey(addressDerivationPath, rootKey);
     return { payment: payments.p2pkh({ pubkey: extendedKey?.publicKey }), extendedKey };
