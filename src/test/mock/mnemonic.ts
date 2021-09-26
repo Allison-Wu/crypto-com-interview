@@ -8,8 +8,8 @@ export interface IMockMnemonic {
   indexes: number[];
   words: string[],
   wordList: string[];
-  rootKey?: string;
-  seed?: string;
+  rootKey: string;
+  seed: string;
 }
 
 export const mockMnemonics: IMockMnemonic[] = [{
