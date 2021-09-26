@@ -6,13 +6,15 @@ import logger from 'redux-logger';
 import { derivationPathSlice } from './derivation-path-store';
 import { derivedAddressesSlice } from './derived-addresses-store';
 import { mnemonicSlice } from './mnemonic-store';
+import { multiSigSlice } from './multi-sig-store';
 
-const isDev = process.env.STAGE === 'dev';
+const isDev = true;
 
 const rootReducer = combineReducers({
   mnemonic: mnemonicSlice.reducer,
   derivedAddresses: derivedAddressesSlice.reducer,
   derivationPath: derivationPathSlice.reducer,
+  multiSig: multiSigSlice.reducer,
 });
 
 export const store = configureStore({
@@ -26,6 +28,10 @@ export const storeActions = {
   calcDerivationPath: derivationPathSlice.actions.calcDerivationPath,
   addDerivedAddress: derivedAddressesSlice.actions.addDerivedAddress,
   resetDerivedAddress: derivedAddressesSlice.actions.resetDerivedAddress,
+  calcMultiSig: multiSigSlice.actions.calcMultiSig,
+  setMultiSigN: multiSigSlice.actions.setN,
+  setMultiSigM: multiSigSlice.actions.setM,
+  setMultiSigPk: multiSigSlice.actions.setPublicKey,
 };
 
 export type AppDispatch = typeof store.dispatch;
