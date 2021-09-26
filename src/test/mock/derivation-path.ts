@@ -9,7 +9,7 @@ export const pathLevel: IPathLevel = {
 
 export const derivationPath: IDerivationPath = {
   ...pathLevel,
-  derivationPath: 'm/44/0\'/0\'/0',
+  derivationPath: 'm/44\'/0\'/0\'/0',
   bip32PrivateKey: '',
   bip32PublicKey: '',
   accountPrivateKey: '',

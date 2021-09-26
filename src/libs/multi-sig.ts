@@ -2,8 +2,8 @@ import * as bitcoin from 'bitcoinjs-lib';
 
 export class MultiSig {
   static getP2ms(publicKeys: string[], numOfApprove: number) {
-    if (numOfApprove > publicKeys.length) {
-      throw new Error (`numOfApprove[${numOfApprove}] is larger than public key`);
+    if (!numOfApprove || numOfApprove > publicKeys.length) {
+      throw new Error (`Invalid numOfApprove[${numOfApprove}]!`);
     }
     const pubKeys = publicKeys.map(s => Buffer.from(s, 'hex'));
     return bitcoin.payments.p2ms({m: numOfApprove, pubkeys: pubKeys});
