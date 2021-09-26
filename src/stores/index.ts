@@ -8,7 +8,7 @@ import { derivedAddressesSlice } from './derived-addresses-store';
 import { mnemonicSlice } from './mnemonic-store';
 import { multiSigSlice } from './multi-sig-store';
 
-const isDev = true;
+const isDev = process.env.STAGE === 'dev';
 
 const rootReducer = combineReducers({
   mnemonic: mnemonicSlice.reducer,

@@ -11,19 +11,6 @@ export interface IMultiSig {
   p2shAddress?: string;
 }
 
-const isKeysReady = (publicKeys: string[]) => {
-  if (publicKeys.length === 0 || isArrayIncludeEmpty(publicKeys)) {
-    return false;
-  }
-  try{
-    publicKeys.map(s => Buffer.from(s, 'hex'));
-    return true;
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
-};
-
 export const multiSigSlice = createSlice({
   name: 'multiSigInfo',
   initialState: {
@@ -35,13 +22,18 @@ export const multiSigSlice = createSlice({
     calcMultiSig: (state, action: PayloadAction<IMultiSig>):IMultiSig => {
       const { numOfApprove, numOfParticipant, publicKeys } = action.payload;
       const result: IMultiSig = { numOfParticipant, publicKeys, numOfApprove };
-      if (!numOfApprove || !isKeysReady(publicKeys)) {
+      if (!numOfApprove || !publicKeys.length) {
         return result;
       }
-      const { p2ms, p2sh } = MultiSig.calcP2sh(publicKeys, numOfApprove);
-      result.redeemScript = p2ms.output?.toString('hex');
-      result.p2shAddress = p2sh.address;
-      return result;
+      try{
+        const { p2ms, p2sh } = MultiSig.calcP2sh(publicKeys, numOfApprove);
+        result.redeemScript = p2ms.output?.toString('hex');
+        result.p2shAddress = p2sh.address;
+        return result;
+      } catch {
+        console.log('Invalid public keys');
+        return result;
+      }
     },
 
     setN: (state, action: PayloadAction<number>):IMultiSig => {
