@@ -1,5 +1,4 @@
-import { Grid, MenuItem, Select } from '@mui/material';
-import { SelectInputProps } from '@mui/material/Select/SelectInput';
+import { Button, Grid, MenuItem, Select } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { PageLayout } from '../components/layout';
 import { DisableTextField } from '../components/disable-text-filed';
@@ -9,7 +8,7 @@ const WORDS_NUM_OPTIONS = [3,6,9,12,15,18,21,24];
 
 interface INumOfWordsSelection {
   numOfWords: number;
-  handleChange?: SelectInputProps<number>['onChange'];
+  handleChange: (value: number) => void;
 }
 
 const NumOfWordsSelection = (props: INumOfWordsSelection) => (
@@ -17,7 +16,8 @@ const NumOfWordsSelection = (props: INumOfWordsSelection) => (
     labelId='num-of-words-selection'
     id='num-of-words-select'
     value={props.numOfWords}
-    onChange={props.handleChange} size='small'
+    onChange={event => props.handleChange(Number(event.target.value))}
+    size='small'
   >
     {WORDS_NUM_OPTIONS.map((num) => (
       <MenuItem key={num} value={num}>
@@ -30,9 +30,14 @@ const NumOfWordsSelection = (props: INumOfWordsSelection) => (
 const SelectSentence = (props: INumOfWordsSelection) => {
   return (
     <Grid container spacing={2}>
-      <Grid item><p>Generate a random mnemonic:</p></Grid>
-      <Grid item><NumOfWordsSelection numOfWords={props.numOfWords} handleChange={props.handleChange} /></Grid>
-      <Grid item><p>words, or enter your own below.</p></Grid>
+      <Grid item>
+        <Button variant="contained" onClick={() => props.handleChange(props.numOfWords)}>Generate</Button>
+      </Grid>
+      <Grid item><p> a random mnemonic:</p></Grid>
+      <Grid item>
+        <NumOfWordsSelection numOfWords={props.numOfWords} handleChange={props.handleChange} />
+      </Grid>
+      <Grid item><p>words.</p></Grid>
     </Grid>
   );
 };
@@ -44,9 +49,7 @@ const Mnemonic = () => {
     <PageLayout title='Mnemonic'>
       <SelectSentence
         numOfWords={mnemonicState.numOfWords}
-        handleChange={event => dispatch(
-          storeActions.calcMnemonic({ numOfWords: Number(event.target.value) })
-        )}
+        handleChange={value => dispatch(storeActions.calcMnemonic({ numOfWords: value }))}
       />
       <DisableTextField label='BIP39 Mnemonic' value={mnemonicState.words} />
       <DisableTextField label='BIP39 Seed' value={mnemonicState.seed} />

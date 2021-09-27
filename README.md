@@ -1,6 +1,6 @@
 # Allison crypto.com interview
 
-[The site](https://d1322f715s35d8.cloudfront.net/index.html) deployed to AWS S3 + CloudFront for your preview, please check the docs as below:
+[The site](https://allison-crypto-com-interview.s3.amazonaws.com/index.html) deployed to AWS S3 + CloudFront for your preview, please check the docs as below:
 
 ## The libraries are used in this project
 ### Front End
