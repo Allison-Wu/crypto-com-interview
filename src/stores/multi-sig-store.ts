@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import _ from 'lodash';
-import { generateArray, isArrayIncludeEmpty } from '../libs/helpers';
 import { MultiSig } from '../libs/multi-sig';
 
 export interface IMultiSig {
@@ -10,6 +9,8 @@ export interface IMultiSig {
   redeemScript?: string;
   p2shAddress?: string;
 }
+
+const generateArray = (size: number): string[] => Array(size).fill('');
 
 export const multiSigSlice = createSlice({
   name: 'multiSigInfo',
@@ -38,7 +39,7 @@ export const multiSigSlice = createSlice({
 
     setN: (state, action: PayloadAction<number>):IMultiSig => {
       const newValue = action.payload;
-      if (newValue >= state.publicKeys.length) return state;
+      if (newValue >= state.publicKeys.length || newValue < 1) return state;
       return {
         ...state,
         numOfApprove: action.payload
